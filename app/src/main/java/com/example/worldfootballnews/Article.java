@@ -1,23 +1,27 @@
 package com.example.worldfootballnews;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Article {
-    @SerializedName(value = "headline", alternate = {"title"})
+    @JsonProperty("headline")
+    @JsonAlias({"title"})
     private String headline;
 
-    @SerializedName("description")
+    @JsonProperty("description")
     private String description;
 
-    @SerializedName("published")
+    @JsonProperty("published")
     private String published;
 
-    @SerializedName("images")
+    @JsonProperty("images")
     private List<EspnImage> images;
 
-    @SerializedName("links")
+    @JsonProperty("links")
     private EspnLinks links;
 
     public String getTitle() {

@@ -1,9 +1,11 @@
 package com.example.worldfootballnews;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EspnImage {
-    @SerializedName("url")
+    @JsonProperty("url")
     private String url;
 
     public String getUrl() {

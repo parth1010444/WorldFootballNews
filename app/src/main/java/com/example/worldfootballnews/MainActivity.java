@@ -1,6 +1,7 @@
 package com.example.worldfootballnews;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,20 +16,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.appbar.AppBarLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private NewsAdapter newsAdapter;
-    private AppBarLayout appBarLayout;
     private ProgressBar pullToRefreshIndicator;
     private ProgressBar loadingIndicator;
     private TextView messageText;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isRefreshing = false;
     private float startY;
 
-    private String selectedLeague = "fifa.world";
+    private String selectedLeague = "eng.1";
     private final String[] leagueNames = {
             "FIFA World Cup", "UEFA Champions League", "English Premier League",
             "Spanish LALIGA", "German Bundesliga", "Italian Serie A",
@@ -55,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        appBarLayout = findViewById(R.id.appBarLayout);
         pullToRefreshIndicator = findViewById(R.id.pullToRefreshIndicator);
         loadingIndicator = findViewById(R.id.loadingIndicator);
         messageText = findViewById(R.id.messageText);
@@ -90,22 +91,13 @@ public class MainActivity extends AppCompatActivity {
                     ((CheckedTextView) view).setChecked(position == getSelectedItemPosition());
                 }
 
-                // Handle selection via touch event
-                view.setOnTouchListener((v, event) -> {
-                    if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-                        v.performClick();
-                        leagueSpinner.setSelection(position);
-                    }
-                    return false; // Return false to allow the Spinner to also handle the click/dismiss
-                });
-
                 return view;
             }
 
             private int getSelectedItemPosition() {
-                for (int j = 0; j < leagueIds.length; j++) {
-                    if (leagueIds[j].equals(selectedLeague)) {
-                        return j;
+                for (int i = 0; i < leagueIds.length; i++) {
+                    if (leagueIds[i].equals(selectedLeague)) {
+                        return i;
                     }
                 }
                 return 0;
@@ -156,9 +148,24 @@ public class MainActivity extends AppCompatActivity {
     private void fetchFootballNews() {
         showLoading(true);
 
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(chain -> {
+                    Request original = chain.request();
+                    Request request = original.newBuilder()
+                            .header("User-Agent", "WorldFootballNews/1.0")
+                            .method(original.method(), original.body())
+                            .build();
+                    return chain.proceed(request);
+                })
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://site.api.espn.com/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 
         NewsApiService apiService = retrofit.create(NewsApiService.class);
@@ -166,9 +173,18 @@ public class MainActivity extends AppCompatActivity {
                 .enqueue(new Callback<NewsResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
+                        Log.d("MainActivity", "onResponse: " + response.code());
                         showLoading(false);
 
                         if (!response.isSuccessful() || response.body() == null) {
+                            Log.e("MainActivity", "Response unsuccessful: " + response.code());
+                            try {
+                                if (response.errorBody() != null) {
+                                    Log.e("MainActivity", "Error body: " + response.errorBody().string());
+                                }
+                            } catch (Exception e) {
+                                Log.e("MainActivity", "Error reading error body", e);
+                            }
                             showMessage("Could not load football news. Please try again later.");
                             return;
                         }
@@ -186,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable throwable) {
                         showLoading(false);
+                        Log.e("MainActivity", "Error fetching news", throwable);
                         showMessage("Network error. Check your internet connection and try again.");
                     }
                 });
@@ -203,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             pullToRefreshIndicator.setVisibility(View.GONE);
             loadingIndicator.setVisibility(View.GONE);
-            appBarLayout.setExpanded(true, true);
+            // Removed: appBarLayout.setExpanded(true, true);
         }
     }
 
