@@ -2,12 +2,13 @@ package com.example.worldfootballnews;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface NewsApiService {
-    @GET("v1/sports/news")
+    @GET("apis/site/v2/sports/soccer/{league}/news")
     Call<NewsResponse> getSoccerNews(
-            @Query("sport") String sport,
+            @Path("league") String league,
             @Query("limit") int limit
     );
 }

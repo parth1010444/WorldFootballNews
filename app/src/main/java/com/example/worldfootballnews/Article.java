@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class Article {
-    @SerializedName("headline")
+    @SerializedName(value = "headline", alternate = {"title"})
     private String headline;
 
     @SerializedName("description")
