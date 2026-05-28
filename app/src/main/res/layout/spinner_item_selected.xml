@@ -4,4 +4,4 @@
     android:layout_height="48dp"
     android:padding="12dp"
     android:src="@drawable/ic_filter"
-    android:contentDescription="Filter League" />
+    android:contentDescription="@string/filter_league" />

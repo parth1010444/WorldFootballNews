@@ -41,9 +41,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     }
 
     public void updateArticles(List<Article> nextArticles) {
+        int oldSize = articles.size();
         articles.clear();
+        if (oldSize > 0) {
+            notifyItemRangeRemoved(0, oldSize);
+        }
+
         articles.addAll(nextArticles);
-        notifyDataSetChanged();
+        if (!nextArticles.isEmpty()) {
+            notifyItemRangeInserted(0, nextArticles.size());
+        }
     }
 
     static class NewsViewHolder extends RecyclerView.ViewHolder {

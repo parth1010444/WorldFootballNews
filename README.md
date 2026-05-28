@@ -13,9 +13,10 @@
 
 ## 📸 Screenshots
 
-| News Feed | League Selection | Pull-to-Refresh |
-| :---: | :---: | :---: |
-| ![News Feed](https://github.com/yourusername/WorldFootballNews/raw/main/screenshots/news_feed.png) | ![League Selection](https://github.com/yourusername/WorldFootballNews/raw/main/screenshots/league_selection.png) | ![Pull-to-Refresh](https://github.com/yourusername/WorldFootballNews/raw/main/screenshots/pull_to_refresh.png) |
+<img width="360" height="740" alt="Screenshot_20260528_182448" src="https://github.com/user-attachments/assets/55d81b02-2353-4f25-9991-6c999ff53452" />
+<img width="360" height="740" alt="Screenshot_20260528_182614" src="https://github.com/user-attachments/assets/ddf39da4-59fc-4d45-b264-ce7c65754cda" />
+<img width="360" height="740" alt="Screenshot_20260528_182626" src="https://github.com/user-attachments/assets/7da91c58-a251-4638-8cde-e1387d8ab407" />
+
 
 ## 🛠️ Tech Stack
 

@@ -77,10 +77,11 @@ public class MainActivity extends AppCompatActivity {
             @NonNull
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                if (convertView != null) {
-                    return convertView;
+                View view = convertView;
+                if (view == null) {
+                    view = getLayoutInflater().inflate(R.layout.spinner_item_selected, parent, false);
                 }
-                return getLayoutInflater().inflate(R.layout.spinner_item_selected, parent, false);
+                return view;
             }
 
             @NonNull
